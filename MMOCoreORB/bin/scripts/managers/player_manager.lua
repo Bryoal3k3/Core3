@@ -44,20 +44,20 @@
 --GENERAL PLAYER SETTINGS
 -----------------------------------
 
-onlineCharactersPerAccount = 2 --How many characters are allowed online from a single account.
-allowSameAccountPvpRatingCredit = 0
+onlineCharactersPerAccount = 10 --How many characters are allowed online from a single account.
+allowSameAccountPvpRatingCredit = 1
 
 --Blue frog / GM buff values
-performanceBuff = 1100
-medicalBuff = 2200
+performanceBuff = 1500
+medicalBuff = 2400
 performanceDuration = 7200 -- in seconds
 medicalDuration = 7200 -- in seconds
 
 --Sets the experience multiplier while grouped
-groupExpMultiplier = 1.2
+groupExpMultiplier = 4
 
 --Sets a global experience multiplier
-globalExpMultiplier = 1.0
+globalExpMultiplier = 8
 
 --Sets the base number of control devices of each type that a player can have in their datapad at once
 --For creature pets, A Creature Handler will have the base number + their stored pets skill mod as limit
@@ -70,7 +70,7 @@ baseStoredShips = 3
 -----------------------------------
 --VETERAN REWARDS CONFIG
 -----------------------------------
-veteranRewardMilestones = {90, 180, 270, 360, 450, 540, 630, 720, 810, 900, 990, 1080} --days, must be sorted low to high
+veteranRewardMilestones = {30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330, 365} --days, must be sorted low to high
 
 veteranRewardAdditionalMilestones = 360 --frequency, in days, of additional milestones (beyond the established ones)
 
