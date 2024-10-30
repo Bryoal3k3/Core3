@@ -81,8 +81,8 @@ void ShipAiAgentImplementation::loadTemplateData(SharedShipObjectTemplate* shipT
 	// Special AI Template behavior tree
 	customShipAiMap = shipTemp->getCustomShipAiMap();
 
-	experienceValue = Math::max(50, shipTemp->getExperienceValue());
-	factionReward = Math::max(8, shipTemp->getFactionRewardValue());
+	experienceValue = shipTemp->getExperienceValue();
+	factionMultiplier = shipTemp->getFactionMultiplier();
 
 	const auto& componentNames = shipTemp->getComponentNames();
 	const auto& componentValues = shipTemp->getComponentValues();
@@ -1841,6 +1841,12 @@ bool ShipAiAgentImplementation::validateTarget(ShipObject* targetShip) {
 }
 
 int ShipAiAgentImplementation::notifyObjectDestructionObservers(TangibleObject* attacker, int condition, bool isCombatAction) {
+	if (getOptionsBitmask() & OptionBitmask::DESTROYING) {
+		return 1;
+	}
+
+	setOptionBit(OptionBitmask::DESTROYING, false);
+
 	if (attacker == nullptr) {
 		attacker = asShipAiAgent();
 	} else if (attacker->isPlayerShip()) {

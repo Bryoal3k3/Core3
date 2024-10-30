@@ -80,7 +80,7 @@ talus = {
 
 tatooine = {
 	jtlTravelPoints = {
-		{"Mos Eisley Starport", 3416.6914, 5, -4648.1411},
+		{"Mos Eisley Starport", 3599.894, 5, -4780.4487},
 		{"Bestine Starport", -1361.1917, 12, -3600.0254},
 		{"Mos Espa Starport", -2833.1609, 5, 2107.3787},
 		{"Mos Entha Starport", 1266.0996, 7, 3065.1392},
@@ -98,6 +98,13 @@ yavin4 = {
 	},
 
 	jtlLaunchPoint = {"space_yavin4", -5600, -5200, -5200}
+}
+
+tutorial = {
+	jtlLaunchPoint = {"space_dathomir", -6900, 2750, -4000},
+}
+
+dungeon1 = {
 }
 
 space_corellia = {
@@ -138,6 +145,17 @@ space_endor = {
 	}
 }
 
+space_heavy1 = {
+	spaceStations = {
+		{templateFile = "object/ship/spacestation_rebel.iff", x = 4927, z = 0, y = -7106, ow = 0, ox = 1, oy = 0, oz = 0, parentid = 0},
+	}
+}
+
+space_light1 = {
+	spaceStations = {
+	}
+}
+
 space_lok = {
 	spaceStations = {
 		{templateFile = "object/ship/spacestation_imperial.iff", x = -1798.64, z = 2649.25, y = 400.89, ow = -0.031722, ox = 0.0158608, oy = 0.999245, oz = 0.0158608, parentid = 0},
@@ -169,9 +187,4 @@ space_yavin4 = {
 	}
 }
 
-tutorial = {
-	jtlLaunchPoint = {"space_dathomir", -6900, 2750, -4000},
-}
 
-dungeon1 = {
-}

@@ -394,42 +394,57 @@ void ShipManager::loadShipTurretLuaData() {
 void ShipManager::loadShipCollisionData() {
 	info(true) << "Loading Ship Collision Data";
 
-	IffStream* iffStream = DataArchiveStore::instance()->openIffFile("datatables/space/ship_chassis.iff");
+	Lua* lua = new Lua();
+	lua->init();
 
-	if (iffStream == nullptr) {
-		fatal("datatables/space/ship_chassis.iff could not be found.");
-		return;
+	if (lua->runFile("scripts/managers/space/ship_chassis.lua")) {
+		LuaObject luaData = lua->getGlobalObject("chassisData");
+
+		if (luaData.isValidTable() && luaData.getTableSize() > 0) {
+			for (int i = 1; i <= luaData.getTableSize(); ++i) {
+				auto row = luaData.getObjectAt(i);
+
+				if (!row.isValidTable() || row.getTableSize() < 3) {
+					row.pop();
+					continue;
+				}
+
+				String chassisType = row.getStringAt(1);
+				String chassisName = row.getStringAt(2);
+				String chassisPath = row.getStringAt(3);
+				row.pop();
+
+				if (chassisType == "" || chassisName == "" || chassisPath == "") {
+					continue;
+				}
+
+				auto chassisData = getChassisData(chassisName);
+
+				if (chassisData == nullptr) {
+					continue;
+				}
+
+				uint32 templateCRC = chassisPath.hashCode();
+
+				auto templateObject = TemplateManager::instance()->getTemplate(templateCRC);
+
+				if (templateObject == nullptr) {
+					continue;
+				}
+
+				auto chassisTemplate = dynamic_cast<SharedShipObjectTemplate*>(templateObject);
+
+				if (chassisTemplate == nullptr) {
+					continue;
+				}
+
+				Reference<ShipCollisionData*> data = new ShipCollisionData(chassisTemplate, chassisData);
+				shipCollisionData.put(templateCRC, data);
+			}
+		}
 	}
 
-	DataTableIff dtiff;
-	dtiff.readObject(iffStream);
-
-	for (int i = 0; i < dtiff.getTotalRows(); ++i) {
-		DataTableRow* row = dtiff.getRow(i);
-		if (row == nullptr || row->getCellsSize() == 0) {
-			continue;
-		}
-
-		DataTableCell* cell = row->getCell(0);
-		if (cell == nullptr) {
-			continue;
-		}
-
-		String key = cell->toString();
-		if (key == "") {
-			continue;
-		}
-
-		auto shipData = getChassisData(key);
-		if (shipData == nullptr) {
-			continue;
-		}
-
-		Reference<ShipCollisionData*> data = new ShipCollisionData(key, shipData);
-		shipCollisionData.put(key, data);
-	}
-
-	delete iffStream;
+	delete lua;
 
 	info(true) << "Ship Collision Data Loading Complete - Total: " << shipCollisionData.size();
 }
@@ -885,6 +900,24 @@ int ShipManager::notifyDestruction(ShipObject* destructorShip, ShipAiAgent* dest
 	}
 
 	try {
+		/* Order of priority
+			1. Credit chip Granted
+			2. Loot Given
+			3. Quest Kill
+			4. Ship Destroyed (killed creature style observer if needed)
+			5. FP Awarded
+			5. XP awarded
+		*/
+
+		// TODO: Grant Credit Chip here
+
+
+
+		// object/tangible/item/loot_credit_chip.iff
+		// 'string/en/space/space_loot.stf', '11', 'looted_credits', '%TT has looted a credit chip worth %DI credits.
+
+
+
 		// Quest Kill Observers
 		SortedVector<ManagedReference<Observer* > > observers = destructedShip->getObservers(ObserverEventType::QUESTKILL);
 
@@ -906,7 +939,7 @@ int ShipManager::notifyDestruction(ShipObject* destructorShip, ShipAiAgent* dest
 		}
 
 
-		// TODO: Killed creature style observer for ship agents
+		// TODO: Grant Loot here
 
 
 		// Handle Awarding XP
@@ -915,9 +948,6 @@ int ShipManager::notifyDestruction(ShipObject* destructorShip, ShipAiAgent* dest
 		if (playerManager != nullptr) {
 			playerManager->disseminateSpaceExperience(destructedShip, &copyThreatMap);
 		}
-
-		// TODO: Award Credit Chip and Loot here
-
 	} catch (Exception& e) {
 		destructedShip->scheduleDespawn(10, true);
 
