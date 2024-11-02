@@ -40,7 +40,7 @@ function mission_level_choice:showLevels(pPlayer)
     local text = "Use this menu to select a mission level range to aim for. After you have chosen a range, use the mission terminal to get a selection of missions.\n\nIf no missions are shown, it is because no missions in that level range exist for this planet. You will need to choose another range.\n\nWhen you want to back to 'normal' offering of missions for your skill level, just choose Reset Level Range."
     sui.setPrompt(text)
     for i = 1, #self.levels, 1 do
-        sui.add(Self.levels[i].levelRange, "")
+        sui.add(self.levels[i].levelRange, "")
     end
     sui.sendTo(pPlayer)
 end
@@ -65,5 +65,5 @@ function  mission_level_choice:levelSelection(pPlayer, pSui, eventIndex, args)
 	else	
 		CreatureObject(pPlayer):sendSystemMessage("You have selected: " .. selectedRange .. ".  These missions would be considered suitable for a player or group of level " .. selectedLevel .. ".")
 	end
-    
+
 end
