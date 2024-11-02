@@ -792,7 +792,7 @@ void MissionManagerImplementation::randomizeGenericDestroyMission(CreatureObject
 
 	int levelChoice = Integer::valueOf(level);
 
-		PlayerObject* targetGhost = player->getPlayerObject();
+	
 	String dir = targetGhost->getScreenPlayData("mission_direction_choice", "directionChoice");
 	
 	float dirChoice = Float::valueOf(dir);
