@@ -1079,6 +1079,7 @@ void EntertainingSessionImplementation::awardEntertainerExperience() {
 
 		if (healingXp > 0) {
 			String healxptype("entertainer_healing");
+			int increasedHealingXp = healingXp * 10;
 
 			if (playerManager != nullptr)
 				playerManager->awardExperience(player, healxptype, healingXp, true);
