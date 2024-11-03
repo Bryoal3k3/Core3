@@ -1016,7 +1016,7 @@ void EntertainingSessionImplementation::awardEntertainerExperience() {
 			flourishXp = oldFlourishXp;
 
 			if (flourishXp > 0) {
-				int flourishDec = (int)((float)performance->getFlourishXpMod() / 6.0f);
+				int flourishDec = (int)((float)performance->getFlourishXpMod() / 15.0f);
 				flourishXp -= Math::max(1, flourishDec);
 			}
 
