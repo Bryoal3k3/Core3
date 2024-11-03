@@ -1064,7 +1064,7 @@ void EntertainingSessionImplementation::awardEntertainerExperience() {
 
 			float groupMod = groupBonusCount * 0.05;
 
-			float totalBonus = 10.f + groupMod + audienceMod + applauseMod;
+			float totalBonus = 15.f + groupMod + audienceMod + applauseMod;
 
 			xpAmount = ceil(xpAmount * totalBonus);
 
