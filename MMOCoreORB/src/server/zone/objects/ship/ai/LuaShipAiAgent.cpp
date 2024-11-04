@@ -32,6 +32,9 @@ Luna<LuaShipAiAgent>::RegType LuaShipAiAgent::Register[] = {
 	{ "setFixedPatrol", &LuaShipAiAgent::setFixedPatrol },
 	{ "setSquadronPatrol", &LuaShipAiAgent::setSquadronPatrol },
 	{ "setSquadronFollow", &LuaShipAiAgent::setSquadronFollow },
+	{ "setDespawnOnNoPlayerInRange", &LuaShipAiAgent::setDespawnOnNoPlayerInRange },
+	{ "setMinimumGuardPatrol", &LuaShipAiAgent::setMinimumGuardPatrol },
+	{ "setMaximumGuardPatrol", &LuaShipAiAgent::setMaximumGuardPatrol },
 	{ 0, 0 }
 };
 
@@ -116,6 +119,36 @@ int LuaShipAiAgent::setSquadronFollow(lua_State* L) {
 
 	realObject->addShipFlag(ShipFlag::SQUADRON_FOLLOW);
 	realObject->setShipAiTemplate();
+
+	return 0;
+}
+
+int LuaShipAiAgent::setDespawnOnNoPlayerInRange(lua_State* L) {
+	bool val = lua_toboolean(L, -1);
+
+	Locker locker(realObject);
+
+	realObject->setDespawnOnNoPlayerInRange(val);
+
+	return 0;
+}
+
+int LuaShipAiAgent::setMinimumGuardPatrol(lua_State* L) {
+	float minDist = lua_tonumber(L, -1);
+
+	Locker locker(realObject);
+
+	realObject->setMinimumGuardPatrol(minDist);
+
+	return 0;
+}
+
+int LuaShipAiAgent::setMaximumGuardPatrol(lua_State* L) {
+	float maxDist = lua_tonumber(L, -1);
+
+	Locker locker(realObject);
+
+	realObject->setMaximumGuardPatrol(maxDist);
 
 	return 0;
 }
