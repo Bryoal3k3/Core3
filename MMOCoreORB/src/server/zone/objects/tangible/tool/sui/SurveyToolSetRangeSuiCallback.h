@@ -12,6 +12,7 @@
 #include "server/zone/objects/tangible/tool/SurveyTool.h"
 #include "server/zone/objects/player/sui/SuiCallback.h"
 
+
 class SurveyToolSetRangeSuiCallback : public SuiCallback {
 public:
 	SurveyToolSetRangeSuiCallback(ZoneServer* server)
@@ -32,8 +33,32 @@ public:
 		if(surveyTool == nullptr)
 			return;
 
-		int range = 64 * Integer::valueOf(args->get(0).toString()) + 64;
+		int selectedValue = Integer::valueOf(args->get(0).toString());
+		int range;
 
+		switch(selectedValue) {
+			case 0:
+				range = 64;
+				break;
+			case 1:
+				range = 128;
+				break;
+			case 2:
+				range = 192;
+				break;
+			case 3:
+				range = 256;
+				break;
+			case 4:
+				range = 512;
+				break;
+			case 5:
+				range = 1024;
+				break;
+			default:
+				return;
+		}
+		
 		Locker _lock(surveyTool);
 		surveyTool->setRange(range);
 	}

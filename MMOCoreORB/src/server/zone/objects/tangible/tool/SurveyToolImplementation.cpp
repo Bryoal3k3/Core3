@@ -50,7 +50,7 @@ int SurveyToolImplementation::handleObjectMenuSelect(CreatureObject* player, byt
 		if (selectedID == 20) { // use object
 			int range = getRange(player);
 
-			if(range <= 0 || range > 384) {
+			if(range <= 0 || range > 1024) {
 				sendRangeSui(player);
 				return 0;
 			}
@@ -107,10 +107,10 @@ void SurveyToolImplementation::sendRangeSui(CreatureObject* player) {
 		suiToolRangeBox->addMenuItem("256m x 5pts", 3);
 
 	if (surveyMod >= 100)
-		suiToolRangeBox->addMenuItem("512m x 5pts", 7);
+		suiToolRangeBox->addMenuItem("512m x 5pts", 4);
 
 	if (surveyMod >= 120)
-		suiToolRangeBox->addMenuItem("1024m x 5pts", 15);
+		suiToolRangeBox->addMenuItem("1024m x 5pts", 5);
 
 	suiToolRangeBox->setUsingObject(_this.getReferenceUnsafeStaticCast());
 	suiToolRangeBox->setCallback(new SurveyToolSetRangeSuiCallback(server->getZoneServer()));
@@ -152,7 +152,7 @@ void SurveyToolImplementation::setRange(int r) {
 
 	// Set number of grid points in survey SUI 3x3 to 5x5
 	if (range >= 256) {
-		points = 5;
+		points = 6;
 	} else if (range >= 128) {
 		points = 4;
 	} else {
