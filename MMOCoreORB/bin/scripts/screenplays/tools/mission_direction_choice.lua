@@ -1,16 +1,16 @@
 -- Allows players to choose the direction they want to take destroy missions
 --
---							N 90
+--							N 0 and 360
 --							|
---					NW 135  |	NE 45
+--					NW 45   |	NE 315
 --						  \ | /
 --						   \|/
---			W 180 ----------+---------- E 0 and 360
+--			W 90  ----------+---------- E 270
 --						   /|\
 --						  / | \
---					SW 225	|  SE 315
+--					SW 135	|  SE 225
 --							|
---							S 270
+--							S 180
 
 mission_direction_choice = ScreenPlay:new {
 	numberOfActs = 1,
@@ -24,7 +24,7 @@ mission_direction_choice = ScreenPlay:new {
 		{dirDesc = "South", dirSelect = 180}, 
 		{dirDesc = "South West", dirSelect = 135}, 
 		{dirDesc = "West", dirSelect = 90}, 
-		{dirDesc = "North West", dirSelect = 45},
+		{dirDesc = "North West", dirSelect = 45}, 
 	}
 }
 
@@ -36,8 +36,10 @@ function mission_direction_choice:openWindow(pPlayer)
 	if (pPlayer == nil) then
 		return
 	end
+
 	self:showLevels(pPlayer)
 end
+
 function mission_direction_choice:showLevels(pPlayer)
 
 	local cancelPressed = (eventIndex == 1)
@@ -61,11 +63,12 @@ function mission_direction_choice:showLevels(pPlayer)
 	end
 
 	sui.sendTo(pPlayer)
-
 end
 
 function  mission_direction_choice:dirSelection(pPlayer, pSui, eventIndex, args)
+
 	local cancelPressed = (eventIndex == 1)
+
 	if (cancelPressed) then
 		return 
 	end
@@ -81,11 +84,11 @@ function  mission_direction_choice:dirSelection(pPlayer, pSui, eventIndex, args)
 	local selectedDirDesc = self.directions[selectedIndex].dirDesc
 
 	writeScreenPlayData(pPlayer, "mission_direction_choice", "directionChoice", selectedDir) 
-	
-	if (selectedDir == 0) then
+
+	if (selectedDir == -1) then
 		CreatureObject(pPlayer):sendSystemMessage("Mission direction has been reset to normal.")
 	else	
 		CreatureObject(pPlayer):sendSystemMessage("You have selected missions to the " .. selectedDirDesc .. ". This choice will remain active until you change or reset it.")
-
 	end
-end
+
+end	

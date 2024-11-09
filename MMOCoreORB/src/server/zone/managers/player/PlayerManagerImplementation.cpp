@@ -2140,7 +2140,7 @@ void PlayerManagerImplementation::disseminateExperience(TangibleObject* destruct
 				awardExperience(attackerCreo, xpType, xpAmount);
 			}
 
-			awardExperience(attackerCreo, "combat_general", combatXp, true, 0.1f);
+			awardExperience(attackerCreo, "combat_general", combatXp, true, 0.5f);
 
 
 			//Check if the group leader is a squad leader
