@@ -43,7 +43,7 @@
 
 object_building_player_city_hospital_naboo = object_building_player_city_shared_hospital_naboo:new {
 	lotSize = 0,
-	baseMaintenanceRate = 50,
+	baseMaintenanceRate = 5,
 	allowedZones = {"dantooine", "naboo", "rori"},
 	length = 5,
 	width = 5,

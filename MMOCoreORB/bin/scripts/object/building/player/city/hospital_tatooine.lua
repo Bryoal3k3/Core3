@@ -43,7 +43,7 @@
 
 object_building_player_city_hospital_tatooine = object_building_player_city_shared_hospital_tatooine:new {
 	lotSize = 0,
-	baseMaintenanceRate = 50,
+	baseMaintenanceRate = 5,
 	allowedZones = {"dantooine", "lok", "tatooine"},
 	length = 5,
 	width = 5,

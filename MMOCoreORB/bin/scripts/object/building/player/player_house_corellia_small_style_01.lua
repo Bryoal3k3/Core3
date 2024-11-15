@@ -42,8 +42,8 @@
 
 
 object_building_player_player_house_corellia_small_style_01 = object_building_player_shared_player_house_corellia_small_style_01:new {
-	lotSize = 2,
-	baseMaintenanceRate = 16,
+	lotSize = 0,
+	baseMaintenanceRate = 1,
 	allowedZones = {"corellia", "talus"},
 	publicStructure = 0,
 	skillMods = {

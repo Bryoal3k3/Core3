@@ -42,8 +42,8 @@
 
 
 object_building_player_player_house_generic_medium_style_01 = object_building_player_shared_player_house_generic_medium_style_01:new {
-	lotSize = 2,
-	baseMaintenanceRate = 34,
+	lotSize = 0,
+	baseMaintenanceRate = 3,
 	allowedZones = {"corellia", "dantooine", "lok", "naboo", "rori", "talus", "tatooine"},
 	publicStructure = 0,
 	skillMods = {

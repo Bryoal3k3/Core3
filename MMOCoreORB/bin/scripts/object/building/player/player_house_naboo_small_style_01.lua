@@ -42,8 +42,8 @@
 
 
 object_building_player_player_house_naboo_small_style_01 = object_building_player_shared_player_house_naboo_small_style_01:new {
-	lotSize = 1,
-	baseMaintenanceRate = 16,
+	lotSize = 0,
+	baseMaintenanceRate = 1,
 	allowedZones = {"dantooine", "naboo", "rori"},
 	publicStructure = 0,
 	skillMods = {
