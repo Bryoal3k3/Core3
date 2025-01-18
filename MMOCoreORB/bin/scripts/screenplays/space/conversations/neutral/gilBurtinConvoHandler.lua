@@ -5,8 +5,9 @@ gilBurtinConvoHandler = conv_handler:new {}
 function gilBurtinConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 	local convoTemplate = LuaConversationTemplate(pConvTemplate)
 
-	-- Does not have JTL check??
-	-- return convoTemplate:getScreen("you_dont_look")
+	if (not isJtlEnabled()) then
+		return convoTemplate:getScreen("you_dont_look")
+	end
 
 	-- Player is a neutral pilot
 	if (SpaceHelpers:isNeutralPilot(pPlayer)) then
@@ -95,7 +96,7 @@ function gilBurtinConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, s
 	elseif (screenID == "tatooine") then
 		CreatureObject(pNpc):doAnimation("nod_head_multiple")
 	elseif (screenID == "tell_me_more_tatooine") then
-		SpaceHelpers:addTatooinePilotWaypoint(pPlayer)
+		SpaceHelpers:addSmugglersPilotWaypoint(pPlayer)
 
 	-- Rebel Alliance
 	elseif (screenID == "rebel_alliance") then

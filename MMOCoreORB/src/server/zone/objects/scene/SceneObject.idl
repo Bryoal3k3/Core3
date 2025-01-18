@@ -57,6 +57,7 @@ include server.zone.objects.scene.variables.ContainerObjectsMap;
 import server.zone.objects.tangible.TangibleObject;
 import server.zone.objects.creature.ai.AiAgent;
 include templates.appearance.MeshData;
+include templates.appearance.AppearanceTemplate;
 include templates.collision.BaseBoundingVolume;
 include server.zone.objects.scene.variables.StdFunction;
 include server.metrics.Metrics;
@@ -68,6 +69,7 @@ import server.zone.objects.ship.MultiPassengerShipObject;
 import server.zone.objects.ship.FighterShipObject;
 import server.zone.objects.ship.ai.ShipAiAgent;
 import server.zone.objects.ship.ai.SpaceStationObject;
+import server.zone.objects.ship.ai.CapitalShipObject;
 
 @mock
 @json
@@ -1615,6 +1617,13 @@ class SceneObject extends TreeEntry implements Logger, Metrics {
 	@virtualStub
 	public native abstract SpaceStationObject asSpaceStationObject();
 
+	@mock
+	@dirty
+	@local
+	@nativeStub
+	@virtualStub
+	public native abstract CapitalShipObject asCapitalShipObject();
+
 	@dirty
 	@local
 	@nativeStub
@@ -1665,6 +1674,11 @@ class SceneObject extends TreeEntry implements Logger, Metrics {
 	@nativeStub
 	@virtualStub
 	public native abstract boolean isVehicleObject();
+
+	@dirty
+	public abstract boolean isShipComponentObject() {
+		return false;
+	}
 
 	@dirty
 	public abstract boolean isDroidObject() {
@@ -1978,6 +1992,21 @@ class SceneObject extends TreeEntry implements Logger, Metrics {
 	@read
 	public boolean isShipTurret() {
 		return gameObjectType == SceneObjectType.TURRETACCESSLADDER;
+	}
+
+	@read
+	public boolean isShipComponentRepairKit() {
+		return gameObjectType == SceneObjectType.SHIPCOMPONENTREPAIRITEM;
+	}
+
+	@read
+	public boolean isShipInteriorComponent() {
+		return gameObjectType == SceneObjectType.SHIPINTERIORCOMPONENT || gameObjectType == SceneObjectType.SHIPPLASMACONDUIT;
+	}
+
+	@read
+	public native boolean isShipPlasmaConduit() {
+		return gameObjectType == SceneObjectType.SHIPPLASMACONDUIT;
 	}
 
 	@dirty
@@ -2422,4 +2451,8 @@ class SceneObject extends TreeEntry implements Logger, Metrics {
 	public abstract unsigned int getMaximumNumberOfPlayerItems() {
 		return 0;
 	}
+
+	@read
+	@local
+	public native final AppearanceTemplate getAppearanceTemplate();
 }

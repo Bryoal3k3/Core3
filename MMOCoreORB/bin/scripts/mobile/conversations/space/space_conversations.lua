@@ -36,3 +36,18 @@ includeFile("conversations/space/greeters/j1_p0_convo.lua")
 includeFile("conversations/space/greeters/vincie_kalhoon_convo.lua")
 includeFile("conversations/space/greeters/mooch_davoney_convo.lua")
 includeFile("conversations/space/greeters/guillo_parootchie_convo.lua")
+
+-- Coronet
+includeFile("conversations/space/greeters/io_tsomcren_convo.lua")
+includeFile("conversations/space/greeters/ral_mundi_convo.lua")
+includeFile("conversations/space/greeters/tarth_jaxx_convo.lua")
+
+-- Mining Outpost, Dantooine
+includeFile("conversations/space/greeters/rane_yarrow_convo.lua")
+includeFile("conversations/space/greeters/fern_yarrow_convo.lua")
+includeFile("conversations/space/greeters/kess_yarrow_convo.lua")
+
+-- Neutral Pilot
+
+-- Corsec Squadron
+includeFile("conversations/space/neutral/corsec_squadron/rhea_convo.lua")

@@ -43,6 +43,7 @@
 #include "server/zone/objects/scene/SceneObjectType.h"
 #include "server/zone/objects/ship/ShipObject.h"
 #include "server/zone/objects/ship/ai/SpaceStationObject.h"
+#include "server/zone/objects/ship/ai/CapitalShipObject.h"
 #include "server/zone/objects/ship/PobShipObject.h"
 //#include "PositionUpdateTask.h"
 
@@ -2170,6 +2171,14 @@ SpaceStationObject* SceneObjectImplementation::asSpaceStationObject() {
 	return nullptr;
 }
 
+CapitalShipObject* SceneObject::asCapitalShipObject() {
+	return nullptr;
+}
+
+CapitalShipObject* SceneObjectImplementation::asCapitalShipObject() {
+	return nullptr;
+}
+
 PobShipObject* SceneObject::asPobShip() {
 	return nullptr;
 }
@@ -2521,4 +2530,20 @@ void SceneObjectImplementation::setSyncStamp(uint32 value) {
 uint32 SceneObjectImplementation::getSyncStamp() {
 	long deltaTime = System::getMiliTime() - syncTime;
 	return syncStamp + deltaTime;
+}
+
+const AppearanceTemplate* SceneObjectImplementation::getAppearanceTemplate() const {
+	const auto shot = getObjectTemplate();
+
+	if (shot == nullptr) {
+		return nullptr;
+	}
+
+	const auto pob = shot->getPortalLayout();
+
+	if (pob != nullptr && pob->getAppearanceTemplatesSize() > 0) {
+		return pob->getAppearanceTemplate(0);
+	}
+
+	return shot->getAppearanceTemplate();
 }

@@ -11,7 +11,6 @@
 #include "server/zone/managers/conversation/ConversationManager.h"
 
 #include "server/zone/objects/scene/SceneObject.h"
-#include "server/zone/packets/object/NpcConversationMessage.h"
 #include "server/zone/packets/object/StartNpcConversation.h"
 #include "server/zone/packets/object/StringList.h"
 #include "server/zone/managers/stringid/StringIdManager.h"
@@ -71,8 +70,6 @@ bool SpaceStationObjectImplementation::sendConversationStartTo(SceneObject* play
 	return true;
 }
 
-int SpaceStationObjectImplementation::getReceiverFlags() const {
-	int type = CloseObjectsVector::SPACESTATIONTYPE;
-
-	return type | TangibleObjectImplementation::getReceiverFlags();
+float SpaceStationObjectImplementation::getOutOfRangeDistance() const {
+	return ZoneServer::SPACESTATIONRANGE;
 }

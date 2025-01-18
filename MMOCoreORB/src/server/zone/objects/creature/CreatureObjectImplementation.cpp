@@ -153,8 +153,6 @@ void CreatureObjectImplementation::initializeMembers() {
 	performanceType = 0;
 	tradeTargetID = 0;
 
-	pilotTier = 0;
-
 	optionsBitmask = 0x80;
 
 	moodString = "neutral";
@@ -2077,10 +2075,13 @@ void CreatureObjectImplementation::updateSlopeMods(bool notifyClient) {
 }
 
 float CreatureObjectImplementation::getSlopeModPercent() const {
-	float slopeMod = ((float)getSkillMod("slope_move") / 50.0f) + slopeModPercent;
+	float slopeMove = getSkillMod("slope_move");
 
-	if (slopeMod > 1)
-		slopeMod = 1;
+	if (slopeMove > 50.f) {
+		slopeMove = 50.f;
+	}
+
+	float slopeMod = slopeMove / 50.0f;
 
 	return slopeMod;
 }
@@ -2743,8 +2744,24 @@ void CreatureObjectImplementation::activateStateRecovery() {
 		clearState(CreatureState::POISONED);
 	if (isDiseased() && !damageOverTimeList.hasDot(CreatureState::DISEASED))
 		clearState(CreatureState::DISEASED);
-	if (isOnFire() && !damageOverTimeList.hasDot(CreatureState::ONFIRE))
-		clearState(CreatureState::ONFIRE);
+	if (isOnFire()) {
+		auto rootParent = getRootParent();
+
+		// Do not clear the fire state for players in POB's. The ship itself handles the DOT ticks
+		if (rootParent != nullptr && rootParent->isPobShip()) {
+			auto parent = getParent().get();
+
+			if (parent != nullptr && parent->isCellObject()) {
+				auto cellParent = parent.castTo<CellObject*>();
+
+				if (cellParent == nullptr || cellParent->getCellFireVariable() < 1.f) {
+					clearState(CreatureState::ONFIRE);
+				}
+			}
+		} else if (!damageOverTimeList.hasDot(CreatureState::ONFIRE)) {
+			clearState(CreatureState::ONFIRE);
+		}
+	}
 }
 
 void CreatureObjectImplementation::updateToDatabaseAllObjects(bool startTask) {
