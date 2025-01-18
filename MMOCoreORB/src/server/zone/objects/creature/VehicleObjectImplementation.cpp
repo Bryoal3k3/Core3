@@ -231,7 +231,9 @@ void VehicleObjectImplementation::sendRepairConfirmTo(CreatureObject* player) {
 	listbox->setCancelButton(true, "@cancel");
 
 	int repairCost = calculateRepairCost(player);
-	int totalFunds = player->getBankCredits();
+	int bankFunds = player->getBankCredits();
+	int cashFunds = player->getCashCredits();
+	int totalFunds = bankFunds + cashFunds;
 	int tax = 0;
 
 	ManagedReference<CityRegion*> city = getCityRegion().get();
@@ -241,7 +243,9 @@ void VehicleObjectImplementation::sendRepairConfirmTo(CreatureObject* player) {
 
 	listbox->addMenuItem("@pet/pet_menu:vehicle_prompt " + getDisplayedName()); //Vehicle:
 	listbox->addMenuItem("@pet/pet_menu:repair_cost_prompt " + String::valueOf(repairCost)); //Repair Cost:
-	listbox->addMenuItem("@pet/pet_menu:total_funds_prompt " + String::valueOf(totalFunds)); //Total Funds Available:
+	listbox->addMenuItem("@pet/pet_menu:bank_prompt " + String::valueOf(bankFunds)); //Bank:
+	listbox->addMenuItem("@pet/pet_menu:cash_prompt " + String::valueOf(cashFunds)); //Cash:
+	listbox->addMenuItem("@pet/pet_menu:total_prompt " + String::valueOf(totalFunds)); //Total:
 
 	player->getPlayerObject()->addSuiBox(listbox);
 	player->sendMessage(listbox->generateMessage());

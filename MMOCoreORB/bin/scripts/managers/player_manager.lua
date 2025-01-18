@@ -48,8 +48,8 @@ onlineCharactersPerAccount = 10 --How many characters are allowed online from a 
 allowSameAccountPvpRatingCredit = 1
 
 --Blue frog / GM buff values
-performanceBuff = 1500
-medicalBuff = 2400
+performanceBuff = 2500
+medicalBuff = 3200
 performanceDuration = 7200 -- in seconds
 medicalDuration = 7200 -- in seconds
 
@@ -62,10 +62,10 @@ globalExpMultiplier = 1.5
 --Sets the base number of control devices of each type that a player can have in their datapad at once
 --For creature pets, A Creature Handler will have the base number + their stored pets skill mod as limit
 baseStoredCreaturePets = 2
-baseStoredFactionPets = 3
+baseStoredFactionPets = 10
 baseStoredDroids = 5
-baseStoredVehicles = 3
-baseStoredShips = 3
+baseStoredVehicles = 10
+baseStoredShips = 10
 
 -----------------------------------
 --VETERAN REWARDS CONFIG
