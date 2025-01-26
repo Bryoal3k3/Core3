@@ -65,4 +65,7 @@ includeFile("tangible/wearables/armor/tantel/serverobjects.lua")
 includeFile("tangible/wearables/armor/ubese/serverobjects.lua")
 includeFile("tangible/wearables/armor/zam/serverobjects.lua")
 
+-- Custom .tre files
+includeFile("tangible/wearables/armor/scout_trooper/serverobjects.lua")
+
 -- Server Objects
