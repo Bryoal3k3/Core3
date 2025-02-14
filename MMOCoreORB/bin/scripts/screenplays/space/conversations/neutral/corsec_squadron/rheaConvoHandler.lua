@@ -8,67 +8,40 @@ function rheaConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 	local faction = CreatureObject(pPlayer):getFaction()
 	local playerID = CreatureObject(pPlayer):getObjectID()
 
-	-- Lets dump the players quest for testing
-	--[[
-	if (1 == 1) then
-		removeQuestStatus(playerID .. ":CorsecSquadron")
-		SpaceHelpers:clearSpaceQuest(pPlayer, "patrol", "corellia_privateer_1", 1)
-
-		--SpaceHelpers:clearSpaceQuest(pPlayer, "patrol", "corellia_privateer_1", 1)
-		--SpaceHelpers:clearSpaceQuest(pPlayer, "destroy", "corellia_privateer_2", 1)
-		--SpaceHelpers:clearSpaceQuest(pPlayer, "patrol", "corellia_privateer_3", 1)
-		--SpaceHelpers:clearSpaceQuest(pPlayer, "assassinate", "corellia_privateer_tier1_4a", 1)
-
-		return convoTemplate:getScreen("no_jtl")
-	end
-	]]
-
 	-- JTL is disabled
 	if (not isJtlEnabled()) then
-		CreatureObject(pNpc):doAnimation("shake_head_no")
-
 		return convoTemplate:getScreen("no_jtl") -- Sorry, but you don't look like a pilot to me.
 	end
 
 	-- Player is Rebel Pilot
 	if (SpaceHelpers:isRebelPilot(pPlayer)) then
-		CreatureObject(pNpc):doAnimation("wave_on_dismissing")
-
 		return convoTemplate:getScreen("rebel_pilot") -- Greetings, citizen.  Keep your nose clean and we won't have any trouble.
 	-- Player is Imperial Pilots
 	elseif (SpaceHelpers:isImperialPilot(pPlayer)) then
-		CreatureObject(pNpc):doAnimation("standing_placate")
-
 		return convoTemplate:getScreen("imperial_pilot") -- Nothing to worry about here, sir.  CorSec has the area well secured.
 	end
 
 	local isNeutralPilot = SpaceHelpers:isNeutralPilot(pPlayer)
 	local hasShip = SpaceHelpers:hasCertifiedShip(pPlayer, true)
 
-	local questOneStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, "patrol", "corellia_privateer_1")
-	local questTwoStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, "destroy", "corellia_privateer_2")
-	local questThreeStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, "patrol", "corellia_privateer_3")
-	local questFourStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, "assassinate", "corellia_privateer_tier1_4a")
+	local questOneStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_1.type, CorsecSquadronScreenplay.QUEST_STRING_1.name)
+	local questTwoStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_2.type, CorsecSquadronScreenplay.QUEST_STRING_2.name)
+	local questThreeStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_3.type, CorsecSquadronScreenplay.QUEST_STRING_3.name)
+	local questFourStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_4.type, CorsecSquadronScreenplay.QUEST_STRING_4.name)
 
-	local questOneComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, "patrol", "corellia_privateer_1")
-	local questTwoComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, "destroy", "corellia_privateer_2")
-	local questThreeComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, "patrol", "corellia_privateer_3")
-	local questFourComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, "assassinate", "corellia_privateer_tier1_4a")
+	local questOneComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_1.type, CorsecSquadronScreenplay.QUEST_STRING_1.name) and SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_1_SIDE.type, CorsecSquadronScreenplay.QUEST_STRING_1_SIDE.name)
+	local questTwoComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_2.type, CorsecSquadronScreenplay.QUEST_STRING_2.name)
+	local questThreeComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_3.type, CorsecSquadronScreenplay.QUEST_STRING_3.name) and SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_3_SIDE.type, CorsecSquadronScreenplay.QUEST_STRING_3_SIDE.name)
+	local questFourComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_4.type, CorsecSquadronScreenplay.QUEST_STRING_4.name)
 
 	if (isNeutralPilot and not SpaceHelpers:isCorsecSquadron(pPlayer)) then
-		CreatureObject(pNpc):doAnimation("point_accusingly")
-
 		return convoTemplate:getScreen("non_corsec_pilot") -- Ah, I've heard of you!  You're not a bad pilot from what I understand. What can the CorSec do for you?
 	-- Player does not have neutral pilot novice skill
 	elseif (not isNeutralPilot) then
-		CreatureObject(pNpc):doAnimation("greet")
-
 		return convoTemplate:getScreen("recruitment") -- Hello!  Come to join the ranks of CorSec?
 
 	-- Check to ensure player has a starter ship or one they can use
 	elseif (not hasShip and not questOneStarted) then
-		CreatureObject(pNpc):doAnimation("explain")
-
 		return convoTemplate:getScreen("no_ship") -- You're going to need a ship, if you're going to fly for CorSec.  I'll add the Ship Control Codes to your datapad for you.  It's not a great ship, but it will get you around.
 	end
 
@@ -94,42 +67,65 @@ function rheaConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 			Quests
 	--]]
 
-	-- Player has finished quest 4
-	if (questFourComplete) then
-		CreatureObject(pPlayer):sendSystemMessage("You are ready to train...")
+	-- Player is a CorSec pilot and has at least one of the Tier1 skill boxes
+	if (SpaceHelpers:hasNeutralTier1Skill(pPlayer)) then
 
+		-- TODO: Offer duty missions
 
-	-- Player is actively working on Quest 4
-	elseif (questFourStarted) then
+		return convoTemplate:getScreen("duty_missions")
+	-- Player has an active quest from Sgt Rhea
+	elseif ((questTwoStarted and not questTwoComplete) or (questThreeStarted and not questThreeComplete) or (questFourStarted and not questFourComplete)) then
+			return convoTemplate:getScreen("has_mission")
+	-- Player has finished 4 and has received the reward, but needs to accept training of first pilot skill
+	elseif (questFourComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_4.name .. ":reward") == "1") then
+		return convoTemplate:getScreen("missions_complete")
+	-- Player has completed quest 4 and needs reward
+	elseif (questFourComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_4.name .. ":reward") ~= "1") then
+		-- Give player the reward and update that they received it
+		setQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_4.name .. ":reward", 1)
 
+		-- Grant Reward
+		assassinate_corellia_privateer_tier1_4a:rewardPlayer(pPlayer)
 
-	-- Player has finished quest 3
-	elseif (questThreeComplete) then
+		return convoTemplate:getScreen("missions_complete")
+	-- Player has finished 3, has received the reward and needs to start quest 4
+	elseif (questThreeComplete and not questFourStarted and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_3.name .. ":reward") == "1") then
+		return convoTemplate:getScreen("excellent_work3")
+	-- Player has completed quest 3 and needs reward
+	elseif (questThreeComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_3.name .. ":reward") ~= "1") then
+		-- Give player the reward and update that they received it
+		setQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_3.name .. ":reward", 1)
 
+		-- Grant Reward
+		patrol_corellia_privateer_3:rewardPlayer(pPlayer)
 
-	-- Player is actively working on Quest 3
-	elseif (questThreeStarted) then
+		return convoTemplate:getScreen("excellent_work3")
+	-- Player has finished 2, has received the reward and needs to start quest 3
+	elseif (questTwoComplete and not questThreeStarted and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_2.name .. ":reward") == "1") then
+		return convoTemplate:getScreen("excellent_work2")
+	-- Player has completed quest 2 and needs reward
+	elseif (questTwoComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_2.name .. ":reward") ~= "1") then
+		-- Give player the reward and update that they received it
+		setQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_2.name .. ":reward", 1)
 
+		-- Grant Reward
+		destroy_corellia_privateer_2:rewardPlayer(pPlayer)
 
-	-- Player has finished quest 2
-	elseif (questTwoComplete) then
+		return convoTemplate:getScreen("excellent_work2")
+	-- Player has finished quest 1, has received the reward and needs to start quest 2
+	elseif (questOneComplete and not questTwoStarted and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_1.name .. ":reward") == "1") then
+		return convoTemplate:getScreen("excellent_work")
+	-- Player has finished quest 1 and needs reward
+	elseif (questOneComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_1.name .. ":reward") ~= 1) then
+		-- Give player the reward and update that they received it
+		setQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_1.name .. ":reward", 1)
 
+		-- Grant Reward
+		patrol_corellia_privateer_1:rewardPlayer(pPlayer)
 
-	-- Player is actively working on Quest 2
-	elseif (questTwoStarted) then
-
-
-	-- Player has finished quest 1 and needs to start quest 2
-	elseif (questOneComplete) then
-		CreatureObject(pPlayer):sendSystemMessage("Quest 2 is not implemented yet.")
-
-		--ThemeParkLogic:giveCredits(pPlayer, 100)
-
-		return convoTemplate:getScreen("no_jtl")
+		return convoTemplate:getScreen("excellent_work")
 	-- Player has first quest active, the mission giver will offer assistance
 	elseif (questOneStarted and not questOneComplete) then
-		CreatureObject(pNpc):doAnimation("point_away")
-
 		return convoTemplate:getScreen("first_assignment")
 	-- Player has failed or aborted the first quest
 	elseif (not questOneComplete) then
@@ -150,9 +146,12 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 	local pConvScreen = screen:cloneScreen()
 	local clonedConversation = LuaConversationScreen(pConvScreen)
 
+	-- Set player as conversation target
 	clonedConversation:setDialogTextTU(CreatureObject(pPlayer):getFirstName())
 
-	--print("runScreenHandlers -- Screen ID: " .. screenID)
+	if (self.DEBUG_CORSEC) then
+		print("runScreenHandlers -- Screen ID: " .. screenID)
+	end
 
 	local pGhost = CreatureObject(pPlayer):getPlayerObject()
 
@@ -166,7 +165,12 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 		return pConvScreen
 	end
 
-	local corsecStanding = ghost:getFactionStanding("corsec")
+	if (screenID == "testing_reset") then
+		CorsecSquadronScreenplay:resetRheaQuests(pPlayer)
+		return pConvScreen
+	--elseif (PlayerObject(pGhost):isPrivileged()) then
+		--clonedConversation:addOption("GODMODE - Reset Sgt Rhea Quests", "testing_reset")
+	end
 
 	if (screenID == "non_corsec_pilot") then
 		local isOnQuest = true -- TODO add in function to check for active space quest?
@@ -178,7 +182,8 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 		end
 	elseif (screenID == "yes_join" or screenID == "i_see") then
 		CreatureObject(pPlayer):doAnimation("nod_head_once")
-		CreatureObject(pNpc):doAnimation("slow_down")
+
+		local corsecStanding = ghost:getFactionStanding("corsec")
 
 		if (corsecStanding < 0) then
 			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_1418de80", "of_course_no_good") -- Of course
@@ -251,8 +256,6 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 		else
 			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_90ec63e0", "yes_ship") -- Yes, I do.
 		end
-	elseif (screenID == "yes_denied" or screenID == "no_denied") then
-		CreatureObject(pNpc):doAnimation("shake_head_no")
 	elseif (screenID == "what_do_you_mean") then
 		CreatureObject(pPlayer):doAnimation("cover_mouth")
 	elseif (screenID == "join_denied") then
@@ -272,20 +275,34 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 		end
 
 	-- Missions
-	elseif (screenID == "slow_down") then
-		CreatureObject(pNpc):doAnimation("slow_down")
 	elseif (screenID == "yes_im_ready") then
-		SpaceHelpers:activateSpaceQuest(pPlayer, pNpc, "patrol", "corellia_privateer_1", 1)
-
-		-- Write players quest step status
-		setQuestStatus(SceneObject(pPlayer):getObjectID() .. ":CorsecSquadron", CorsecSquadronScreenplay.ACCEPTED_MISSION_1)
-
-		-- Create inital observer for player entering Corellia Space
-		createObserver(ZONESWITCHED, "CorsecSquadronScreenplay", "enteredZone", pPlayer, 1)
-	elseif (screenID == "an_assignment_exp" or screenID == "where_to_go") then
-		CreatureObject(pNpc):doAnimation("point_away")
-	elseif (screenID == "what_ship" or screenID == "when_done") then
+		patrol_corellia_privateer_1:startQuest(pPlayer, pNpc)
+	elseif (screenID == "i_was_attacked") then
+		CreatureObject(pPlayer):doAnimation("pound_fist_palm")
 		CreatureObject(pNpc):doAnimation("explain")
+	elseif (screenID == "nothing_to_it") then
+		CreatureObject(pPlayer):doAnimation("nod_head_multiple")
+		CreatureObject(pNpc):doAnimation("rub_chin_thoughtful")
+	elseif (screenID == "train_me2") then
+		destroy_corellia_privateer_2:startQuest(pPlayer, pNpc)
+	elseif (screenID == "whats_next") then
+		CreatureObject(pPlayer):doAnimation("shrug_hands")
+	elseif (screenID == "was_a_snap") then
+		CreatureObject(pPlayer):doAnimation("snap_finger1")
+		CreatureObject(pNpc):doAnimation("explain")
+	elseif (screenID == "train_me3") then
+		CreatureObject(pNpc):doAnimation("shake_head_no")
+		CreatureObject(pPlayer):doAnimation("belly_laugh")
+
+		patrol_corellia_privateer_3:startQuest(pPlayer, pNpc)
+	elseif (screenID == "train_me4") then
+		CreatureObject(pNpc):doAnimation("nod_head_once")
+		CreatureObject(pPlayer):doAnimation("belly_laugh")
+
+		assassinate_corellia_privateer_tier1_4a:startQuest(pPlayer, pNpc)
+	elseif (screenID == "train_player") then
+		-- Train player First Skill Box
+		SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_starships_01")
 	end
 
 	return pConvScreen

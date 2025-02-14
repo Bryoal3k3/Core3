@@ -1,5 +1,11 @@
 -- Space Screenplays & Conversation Handlers
 
+includeFile("space/SpaceQuestLogic.lua")
+includeFile("space/SpaceAssassinateScreenplay.lua")
+includeFile("space/SpaceDestroyScreenplay.lua")
+includeFile("space/SpaceEscortScreenplay.lua")
+includeFile("space/SpacePatrolScreenplay.lua")
+includeFile("space/SpaceSurpriseAttackScreenplay.lua")
 
 includeFile("space/chassis_dealer.lua")
 
@@ -34,6 +40,8 @@ includeFile("space/ship_components/ship_interior_component_menu_component.lua")
 --[[
 	Conversation Handlers
 ]]
+
+includeFile("space/conversations/defaultShipConvoHandler.lua")
 includeFile("space/conversations/chassisDealerConvoHandler.lua")
 
 -- Greeters

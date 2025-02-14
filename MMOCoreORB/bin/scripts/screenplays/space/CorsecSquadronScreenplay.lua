@@ -1,192 +1,250 @@
 local Logger = require("utils.logger")
 
-CorsecSquadronScreenplay = ScreenPlay:new {
-	className = "CorsecSquadronScreenplay",
+--[[
 
-	-- Quest Steps
-	ACCEPTED_MISSION_1 = 1, -- corellia_privateer_1 -- Task 1 - Player needs to enter Corellia Space
-	PATROLLING_1 = 2, -- corellia_privateer_1 -- Task 2 - Player is in Space Corellia and given first patrol waypoint
-	PATROLLING_2 = 3,
-	PATROLLING_3 = 4,
-	FINISHED_MISSION_1 = 5,
+	Corsec Squadron Quests
 
-	-- Patrol Points
+]]
+
+patrol_corellia_privateer_1 = SpacePatrolScreenplay:new {
+	className = "patrol_corellia_privateer_1",
+
+	questName = "corellia_privateer_1",
+	questType = "patrol",
+
+	questZone = "space_corellia",
+
+	creditReward = 100,
+
+	sideQuest = true,
+	sideQuestType = "destroy_surpriseattack",
+	sideQuestStart = 2, -- Patrol Point Number
+	sideQuestDelay = 20, -- Time in seconds to wait to trigger side quest
+
 	patrolPoints = {
-		{zoneName = "space_corellia", x = -4381, z = -4943, y = -7262, questStep = 2, radius = 250},
-		{zoneName = "space_corellia", x = -4540, z = -6023, y = -6111, questStep = 3, radius = 250},
-		{zoneName = "space_corellia", x = -2907, z = -4914, y = -5085, questStep = 4, radius = 250},
+		{zoneName = "space_corellia", x = -4381, z = -4943, y = -7262, patrolNumber = 1, radius = 150},
+		{zoneName = "space_corellia", x = -4540, z = -6023, y = -6111, patrolNumber = 2, radius = 150},
+		{zoneName = "space_corellia", x = -2907, z = -4914, y = -5085, patrolNumber = 3, radius = 150},
 	},
 }
 
-registerScreenPlay("CorsecSquadronScreenplay", true)
+registerScreenPlay("patrol_corellia_privateer_1", true)
 
-function CorsecSquadronScreenplay:start()
-	self:spawnActiveAreas()
-end
+destroy_surpriseattack_corellia_privateer_1 = SpaceSurpriseAttackScreenplay:new {
+	className = "destroy_surpriseattack_corellia_privateer_1",
 
-function CorsecSquadronScreenplay:spawnActiveAreas()
-	local areasTable = self.patrolPoints
-	local totalAreas = #areasTable
+	questName = "corellia_privateer_1",
+	questType = "destroy_surpriseattack",
 
-	if (totalAreas < 1) then
-		return
-	end
+	questZone = "space_corellia",
 
-	for i = 1, totalAreas, 1 do
-		local zoneName = areasTable[i].zoneName
-		local x = areasTable[i].x
-		local z = areasTable[i].z
-		local y = areasTable[i].y
-		local questStep = areasTable[i].questStep
+	sideQuest = false,
+	sideQuestType = "",
 
-		if (not isZoneEnabled(zoneName)) then
-			goto skip
-		end
+	parentQuest = "patrol_corellia_privateer_1",
+	parentQuestType = "patrol",
 
-		local pQuestArea = spawnSpaceActiveArea(zoneName, "object/space_active_area.iff", x, z, y, areasTable[i].radius)
+	surpriseAttackShips = {
+		zone = "space_corellia",
+		spawns = {{count = 1, shipName = "blacksun_fighter_s02_tier1"}, {count = 3, shipName = "blacksun_fighter_s01_tier1"}},
+		total = 4,
+	},
+}
 
-		if pQuestArea == nil then
-			Logger:log("CorsecSquadronScreenplay: pQuestArea is nil.", LT_ERROR)
-			return
-		end
+registerScreenPlay("destroy_surpriseattack_corellia_privateer_1", true)
 
-		local questAreaID = SceneObject(pQuestArea):getObjectID()
+destroy_corellia_privateer_2 = SpaceDestroyScreenplay:new {
+	className = "destroy_corellia_privateer_2",
 
-		writeData(questAreaID .. ":QuestStep", questStep)
+	questName = "corellia_privateer_2",
+	questType = "destroy",
 
-		createObserver(ENTEREDAREA, self.className, "notifyEnteredQuestArea", pQuestArea)
+	questZone = "space_corellia",
 
-		::skip::
-	end
-end
+	creditReward = 200,
+
+	sideQuest = false,
+	sideQuestType = "",
+
+	killsRequired = 4,
+
+	shipLocations = {
+		{name = "black_sun_asteroid_1", x = 590, z = -3500, y = -6000},
+		{name = "blacksun_asteroid_three_spawner", x = -6420, z = 6215, y = 6292},
+		{name = "blacksun_asteroid_two_spawner", x = -5209, z = 6681, y = 6765},
+		{name = "blacksun_deep_one_spawner", x = -5175, z = 5404, y = 6138},
+		{name = "blacksun_fighter_five_spawner", x = -1894, z = 3873, y = 3360},
+	},
+
+	shipTypes = {
+		"blacksun_ace_s04_tier1", "blacksun_ace_s04_tier2", "blacksun_aggressor_tier1", "blacksun_aggressor_tier2", "blacksun_bomber_ace_s04_tier1", "blacksun_bomber_ace_s04_tier2",
+		"blacksun_bomber_s01_tier1", "blacksun_bomber_s01_tier2", "blacksun_bomber_s02_tier1", "blacksun_bomber_s02_tier2", "blacksun_bomber_s03_tier1", "blacksun_bomber_s03_tier2",
+		"blacksun_fighter_s01_tier1", "blacksun_fighter_s01_tier2", "blacksun_fighter_s02_tier1", "blacksun_fighter_s02_tier2", "blacksun_fighter_s03_tier1", "blacksun_fighter_s03_tier2",
+		"blacksun_gunship_tier1", "blacksun_gunship_tier2", "blacksun_marauder_tier1", "blacksun_marauder_tier2", "blacksun_vehement_tier1", "blacksun_vehement_tier2", "blacksun_yt1300_tier1",
+		"blacksun_yt1300_tier2", "blacksun_bomber_ace_tier3_dantooine", "blacksun_bomber_s01_tier2_tatooine", "blacksun_bomber_s02_tier3_dantooine", "blacksun_fighter_s01_tier2_tatooine",
+		"blacksun_fighter_s02_tier3_dantooine",
+	},
+}
+
+registerScreenPlay("destroy_corellia_privateer_2", true)
+
+patrol_corellia_privateer_3 = SpacePatrolScreenplay:new {
+	className = "patrol_corellia_privateer_3",
+
+	questName = "corellia_privateer_3",
+	questType = "patrol",
+
+	questZone = "space_corellia",
+
+	creditReward = 500,
+	itemReward = {
+		{species = {SPECIES_ITHORIAN}, item = "object/tangible/wearables/bandolier/ith_mercenary_bandolier.iff"},
+		{species = {-1}, item = "object/tangible/wearables/bandolier/mercenary_bandolier.iff"},
+	},
+
+	sideQuest = true,
+	sideQuestType = "escort",
+	sideQuestStart = 2,
+	sideQuestDelay = 20, -- Time in seconds to wait to trigger side quest
+
+	patrolPoints = {
+		{zoneName = "space_corellia", x = 5549, z = -6501, y = -2720, patrolNumber = 1, radius = 150},
+		{zoneName = "space_corellia", x = 1325, z = -6577, y = -3409, patrolNumber = 2, radius = 150},
+		{zoneName = "space_corellia", x = -1514, z = -6488, y = -3864, patrolNumber = 3, radius = 150},
+		{zoneName = "space_corellia", x = -5687, z = -6381, y = -4872, patrolNumber = 4, radius = 150},
+	},
+}
+
+registerScreenPlay("patrol_corellia_privateer_3", true)
+
+escort_corellia_privateer_3 = SpaceEscortScreenplay:new {
+	className = "escort_corellia_privateer_3",
+
+	questName = "corellia_privateer_3",
+	questType = "escort",
+
+	questZone = "space_corellia",
+
+	sideQuest = false,
+	sideQuestType = "",
+
+	parentQuest = "patrol_corellia_privateer_1",
+	parentQuestType = "patrol",
+
+	escortShip = "freighterheavy_tier1",
+
+	escortPoints = {
+		{name = "privateer_security_escort_1", zoneName = "space_corellia", x = -5034, z = -5439, y = -4558, escortNumber = 1, radius = 250},
+		{name = "privateer_security_escort_2", zoneName = "space_corellia", x = -2103, z = -5336, y = -5600, escortNumber = 2, radius = 250},
+		{name = "privateer_security_escort_3", zoneName = "space_corellia", x = 1262, z = -5572, y = -5035, escortNumber = 3, radius = 250},
+		{name = "privateer_security_escort_4", zoneName = "space_corellia", x = 5940, z = -5892, y = -4039, escortNumber = 4, radius = 250},
+	},
+
+	tauntData = {
+		goodbyeCount = 5,
+		reasonCount = 5,
+		tauntCount = 5,
+		thanksCount = 5,
+	},
+
+	attackDelay = 90, -- In Seconds
+	attackShips = {"blacksun_fighter_s02_tier1", "blacksun_fighter_s03_tier1", "blacksun_fighter_s02_tier1"},
+}
+
+registerScreenPlay("escort_corellia_privateer_3", true)
+
+assassinate_corellia_privateer_tier1_4a = SpaceAssassinateScreenplay:new {
+	className = "assassinate_corellia_privateer_tier1_4a",
+
+	questType = "assassinate",
+	questName = "corellia_privateer_tier1_4a",
+
+	questZone = "space_corellia",
+
+	creditReward = 1000,
+	itemReward = {
+		{species = {-1}, item = "object/tangible/ship/components/weapon/wpn_mission_reward_neutral_mandal_light_blaster.iff"},
+	},
+
+	sideQuest = false,
+	sideQuestType = "",
+
+	arrivalDelay = 6, -- Seconds
+	failTimer = 20, -- Minutes
+
+	assassinateSpawns = {
+		target = "hidden_daggers_eliminator_tier2",
+		escorts = {"hidden_daggers_enforcer_tier1", "hidden_daggers_enforcer_tier1", "hidden_daggers_enforcer_tier1"},
+	},
+
+	targetPatrols = {
+		{name = "assassinate_4", x = 2650, z = -1672, y = -105},
+		{name = "assassinate_5", x = 4431, z = -1858, y = 2196},
+		{name = "corellia_imperial_tier2_assassinate_1", x = -6932, z = -1364, y = -644},
+		{name = "corellia_imperial_tier2_assassinate_2", x = -5276, z = -1117, y = -6270},
+	},
+}
+
+registerScreenPlay("assassinate_corellia_privateer_tier1_4a", true)
 
 --[[
 
-		Observers
+	CorsecSquadronScreenplay
 
---]]
+]]
 
-function CorsecSquadronScreenplay:enteredZone(pPlayer, nill, zoneNameHash)
+CorsecSquadronScreenplay = ScreenPlay:new {
+	screenplayName = "CorsecSquadronScreenplay",
+
+	DEBUG_CORSEC = false,
+
+	QUEST_STRING_1 = {type = "patrol", name = "corellia_privateer_1"},
+	QUEST_STRING_1_SIDE = {type = "destroy_surpriseattack", name = "corellia_privateer_1"},
+	QUEST_STRING_2 = {type = "destroy", name = "corellia_privateer_2"},
+	QUEST_STRING_3 = {type = "patrol", name = "corellia_privateer_3"},
+	QUEST_STRING_3_SIDE = {type = "escort", name = "corellia_privateer_3"},
+	QUEST_STRING_4 = {type = "assassinate", name = "corellia_privateer_tier1_4a"},
+}
+
+registerScreenPlay("CorsecSquadronScreenplay", false)
+
+function CorsecSquadronScreenplay:start()
+end
+
+function CorsecSquadronScreenplay:resetRheaQuests(pPlayer)
 	if (pPlayer == nil) then
-		return 0
-	end
-
-	local pGhost = CreatureObject(pPlayer):getPlayerObject()
-
-	if (pGhost == nullptr) then
 		return
 	end
 
+	patrol_corellia_privateer_1:failQuest(pPlayer, "false")
+	destroy_surpriseattack_corellia_privateer_1:failQuest(pPlayer, "false")
+	destroy_corellia_privateer_2:failQuest(pPlayer, "false")
+	patrol_corellia_privateer_3:failQuest(pPlayer, "false")
+	escort_corellia_privateer_3:failQuest(pPlayer, "false")
+	assassinate_corellia_privateer_tier1_4a:failQuest(pPlayer, "false")
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_1.type, self.QUEST_STRING_1.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_1.type, self.QUEST_STRING_1.name, false)
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_1_SIDE.type, self.QUEST_STRING_1_SIDE.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_1_SIDE.type, self.QUEST_STRING_1_SIDE.name, false)
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_2.type, self.QUEST_STRING_2.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_2.type, self.QUEST_STRING_2.name, false)
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_3.type, self.QUEST_STRING_3.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_3.type, self.QUEST_STRING_3.name, false)
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_3_SIDE.type, self.QUEST_STRING_3_SIDE.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_3_SIDE.type, self.QUEST_STRING_3_SIDE.name, false)
+
+	SpaceHelpers:failSpaceQuest(pPlayer, self.QUEST_STRING_4.type, self.QUEST_STRING_4.name, false)
+	SpaceHelpers:clearSpaceQuest(pPlayer, self.QUEST_STRING_4.type, self.QUEST_STRING_4.name, false)
+
 	local playerID = SceneObject(pPlayer):getObjectID()
-	local currentStep = getQuestStatus(playerID .. ":CorsecSquadron")
-	local spaceCorelliaHash = getHashCode("space_corellia")
 
-	if (currentStep == nil) then
-		currentStep = 0
-	else
-		currentStep = tonumber(currentStep)
-	end
-
-	--print("CorsecSquadronScreenplay:enteredZone called -- Current Quest Step: " .. currentStep .. " Zone Hash: " .. zoneNameHash .. " space_corellia: " .. spaceCorelliaHash)
-
-	-- First Quest - Patrol
-	if (currentStep >= self.ACCEPTED_MISSION_1 or currentStep < self.FINISHED_MISSION_1) then
-		-- Player is in the correct zone
-		if (currentStep == self.ACCEPTED_MISSION_1 and zoneNameHash == spaceCorelliaHash) then
-			-- Complete the quest task 1
-			SpaceHelpers:completeSpaceQuestTask(pPlayer, "patrol", "corellia_privateer_1", 0, 0)
-
-			-- Activate quest task 2
-			SpaceHelpers:activateSpaceQuestTask(pPlayer, "patrol", "corellia_privateer_1", 2, 1)
-
-			-- Update the players quest status
-			setQuestStatus(playerID .. ":CorsecSquadron", self.PATROLLING_1)
-
-			-- Add patrol point to the player
-			local point1 = self.patrolPoints[1]
-			local waypointID = PlayerObject(pGhost):addWaypoint(point1.zoneName, "@spacequest/patrol/corellia_privateer_3:quest_patrol_t", "", point1.x, point1.z, point1.y, WAYPOINTBLUE, true, true, 0, 1)
-
-			setQuestStatus(playerID .. ":CorsecSquadron:waypointID", waypointID)
-
-			return 0
-		-- Player went to wrong zone, fail mission
-		else
-			-- Set Quest failed
-			SpaceHelpers:failSpaceQuest(pPlayer, "patrol", "corellia_privateer_1", 1)
-
-			-- Remove players quest status
-			removeQuestStatus(playerID .. ":CorsecSquadron")
-
-			return 1
-		end
-	end
-
-	return 1
-end
-
-function CorsecSquadronScreenplay:notifyEnteredQuestArea(pActiveArea, pShip)
-	if ((pActiveArea == nil) or (pShip == nil) or (not SceneObject(pShip):isPlayerShip())) then
-		return 0
-	end
-
-	--print("notifyEnteredQuestArea - Ship: " .. SceneObject(pShip):getDisplayedName() .. " entered SpaceActiveArea - X: " .. SceneObject(pActiveArea):getPositionX() .. " Z: " .. SceneObject(pActiveArea):getPositionZ() .. " Y: " .. SceneObject(pActiveArea):getPositionY() .. " Object Position - X: " .. SceneObject(pShip):getPositionX() .. " Z: " .. SceneObject(pShip):getPositionZ() .. " Y: " .. SceneObject(pShip):getPositionY())
-
-	local pPilot = LuaShipObject(pShip):getPilot()
-
-	if (pPilot == nil or not SceneObject(pPilot):isPlayerCreature()) then
-		return 0
-	end
-
-	local pGhost = CreatureObject(pPilot):getPlayerObject()
-
-	if (pGhost == nil) then
-		return 0
-	end
-
-	local playerID = SceneObject(pPilot):getObjectID()
-	local waypointID = tonumber(getQuestStatus(playerID .. ":CorsecSquadron:waypointID"))
-	local currentStep = tonumber(getQuestStatus(playerID .. ":CorsecSquadron"))
-
-	--print("Player Pilot: " .. SceneObject(pPilot):getDisplayedName() .. " Current Quest Step: " .. currentStep .. " WaypointID: " .. waypointID)
-
-	-- Clear the waypointID and waypoint off the player
-	removeQuestStatus(playerID .. ":CorsecSquadron:waypointID")
-	PlayerObject(pGhost):removeWaypoint(waypointID, true)
-
-	-- 1st Patrol point
-	if (currentStep == self.PATROLLING_1) then
-		-- Update the players quest status
-		setQuestStatus(playerID .. ":CorsecSquadron", self.PATROLLING_2)
-
-		-- Add patrol point to the player
-		local point2 = self.patrolPoints[2]
-		local waypointID = PlayerObject(pGhost):addWaypoint(point2.zoneName, "@spacequest/patrol/corellia_privateer_3:quest_patrol_t", "", point2.x, point2.z, point2.y, WAYPOINTBLUE, true, true, 0, 1)
-
-		setQuestStatus(playerID .. ":CorsecSquadron:waypointID", waypointID)
-	-- 2nd Patrol Point
-	elseif (currentStep == self.PATROLLING_2) then
-		-- Update the players quest status
-		setQuestStatus(playerID .. ":CorsecSquadron", self.PATROLLING_3)
-
-		-- Add patrol point to the player
-		local point3 = self.patrolPoints[3]
-		local waypointID = PlayerObject(pGhost):addWaypoint(point3.zoneName, "@spacequest/patrol/corellia_privateer_3:quest_patrol_t", "", point3.x, point3.z, point3.y, WAYPOINTBLUE, true, true, 0, 1)
-
-		setQuestStatus(playerID .. ":CorsecSquadron:waypointID", waypointID)
-	-- 3rd/Final Patrol Point
-	elseif (currentStep == self.PATROLLING_3) then
-		-- Complete the quest task 2
-		SpaceHelpers:completeSpaceQuestTask(pPilot, "patrol", "corellia_privateer_1", 2, 0)
-
-		-- Complete Journal Quest
-		SpaceHelpers:completeSpaceQuest(pPilot, "patrol", "corellia_privateer_1", 1)
-
-		-- Update the players quest status
-		setQuestStatus(playerID .. ":CorsecSquadron", self.FINISHED_MISSION_1)
-
-		-- Remove the zone entry observer
-		dropObserver(ZONESWITCHED, "CorsecSquadronScreenplay", "enteredZone", pPilot)
-	end
-
-	return 0
+	removeQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_1.name .. ":reward")
+	removeQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_2.name .. ":reward")
+	removeQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_3.name .. ":reward")
+	removeQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_4.name .. ":reward")
 end

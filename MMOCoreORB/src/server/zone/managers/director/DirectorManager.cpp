@@ -619,8 +619,14 @@ void DirectorManager::initializeLuaEngine(Lua* luaEngine) {
 	luaEngine->setGlobalInt("PROTOTYPECREATED", ObserverEventType::PROTOTYPECREATED);
 	luaEngine->setGlobalInt("SLICED", ObserverEventType::SLICED);
 	luaEngine->setGlobalInt("ABILITYUSED", ObserverEventType::ABILITYUSED);
+	luaEngine->setGlobalInt("COMBATCOMMANDENQUEUED", ObserverEventType::COMBATCOMMANDENQUEUED);
+	luaEngine->setGlobalInt("FACTIONCHAT", ObserverEventType::FACTIONCHAT);
+	luaEngine->setGlobalInt("NOPLAYERSINRANGE", ObserverEventType::NOPLAYERSINRANGE);
 	luaEngine->setGlobalInt("SPATIALCHAT", ObserverEventType::SPATIALCHAT);
 	luaEngine->setGlobalInt("SHIPAGENTDESPAWNED", ObserverEventType::SHIPAGENTDESPAWNED);
+	luaEngine->setGlobalInt("SQUADRON", ObserverEventType::SQUADRON);
+	luaEngine->setGlobalInt("ENTEREDPOBSHIP", ObserverEventType::ENTEREDPOBSHIP);
+	luaEngine->setGlobalInt("DESTROYEDSHIP", ObserverEventType::DESTROYEDSHIP);
 
 	luaEngine->setGlobalInt("UPRIGHT", CreaturePosture::UPRIGHT);
 	luaEngine->setGlobalInt("PRONE", CreaturePosture::PRONE);
@@ -628,6 +634,18 @@ void DirectorManager::initializeLuaEngine(Lua* luaEngine) {
 	luaEngine->setGlobalInt("KNOCKEDDOWN", CreaturePosture::KNOCKEDDOWN);
 	luaEngine->setGlobalInt("CROUCHED", CreaturePosture::CROUCHED);
 	luaEngine->setGlobalInt("LYINGDOWN", CreaturePosture::LYINGDOWN);
+
+	// Player Species
+	luaEngine->setGlobalInt("SPECIES_HUMAN", CreatureObject::HUMAN);
+	luaEngine->setGlobalInt("SPECIES_RODIAN", CreatureObject::RODIAN);
+	luaEngine->setGlobalInt("SPECIES_TRANDOSHAN", CreatureObject::TRANDOSHAN);
+	luaEngine->setGlobalInt("SPECIES_MONCAL", CreatureObject::MONCAL);
+	luaEngine->setGlobalInt("SPECIES_WOOKIEE", CreatureObject::WOOKIEE);
+	luaEngine->setGlobalInt("SPECIES_BOTHAN", CreatureObject::BOTHAN);
+	luaEngine->setGlobalInt("SPECIES_TWILEK", CreatureObject::TWILEK);
+	luaEngine->setGlobalInt("SPECIES_ZABRAK", CreatureObject::ZABRAK);
+	luaEngine->setGlobalInt("SPECIES_ITHORIAN", CreatureObject::ITHORIAN);
+	luaEngine->setGlobalInt("SPECIES_SULLUSTAN", CreatureObject::SULLUSTAN);
 
 	//Player Arrangements
 	luaEngine->setGlobalLong("RIDER", PlayerArrangement::RIDER);
