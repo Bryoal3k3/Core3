@@ -107,6 +107,40 @@ void SkillManager::loadClientData() {
 		}
 	}
 
+	// Load Droid Commands
+	iffStream = TemplateManager::instance()->openIffFile("datatables/space_command/droid_program_size.iff");
+
+	if (iffStream != nullptr) {
+		DataTableIff datatableIff;
+		datatableIff.readObject(iffStream);
+
+		delete iffStream;
+
+		for (int i = 0; i < datatableIff.getTotalRows(); ++i) {
+			DataTableRow* row = datatableIff.getRow(i);
+
+			if (row == nullptr) {
+				continue;
+			}
+
+			String programName = "";
+			int programSize = 1;
+
+			row->getValue(0, programName);
+			row->getValue(1, programSize);
+
+			if (programName.isEmpty()) {
+				continue;
+			}
+
+			droidProgramSizes.put(programName.hashCode(), programSize);
+
+			String droidCommand = "droid+" + programName;
+			if (!abilityMap.containsKey(droidCommand))
+				abilityMap.put(droidCommand, new Ability(droidCommand));
+		}
+	}
+
 	loadFromLua();
 
 	//If the admin ability isn't in the ability map, then we want to add it manually.
@@ -123,8 +157,8 @@ void SkillManager::loadClientData() {
 
 	loadXpLimits();
 
-	info(true) << "Successfully loaded " << skillMap.size() <<
-	       	" skills and " << abilityMap.size() << " abilities.";
+	info(true) << "Loaded " << skillMap.size() << " skills and " << abilityMap.size() << " abilities.";
+	info(true) << "Loaded " << droidProgramSizes.size() << " Droid Space Command Sizes.";
 }
 
 void SkillManager::loadFromLua() {
@@ -230,6 +264,17 @@ void SkillManager::removeAbilities(PlayerObject* ghost, const Vector<String>& ab
 	}
 
 	ghost->removeAbilities(abilities, notifyClient);
+}
+
+void SkillManager::addDroidCommand(PlayerObject* ghost, const String& abilityName) {
+	Ability* ability = abilityMap.get(abilityName);
+
+	if (ability != nullptr)
+		ghost->addDroidCommand(ability);
+}
+
+void SkillManager::removeDroidCommands(PlayerObject* ghost) {
+	ghost->removeDroidCommands();
 }
 
 /*bool SkillManager::checkPrerequisiteSkill(const String& skillName, CreatureObject* creature) {

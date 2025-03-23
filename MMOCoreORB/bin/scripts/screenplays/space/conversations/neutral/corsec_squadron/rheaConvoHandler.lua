@@ -21,6 +21,8 @@ function rheaConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 		return convoTemplate:getScreen("imperial_pilot") -- Nothing to worry about here, sir.  CorSec has the area well secured.
 	end
 
+	--print("rheaConvoHandler:getInitialScreen  -- called")
+
 	local isNeutralPilot = SpaceHelpers:isNeutralPilot(pPlayer)
 	local hasShip = SpaceHelpers:hasCertifiedShip(pPlayer, true)
 
@@ -33,6 +35,12 @@ function rheaConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 	local questTwoComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_2.type, CorsecSquadronScreenplay.QUEST_STRING_2.name)
 	local questThreeComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_3.type, CorsecSquadronScreenplay.QUEST_STRING_3.name) and SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_3_SIDE.type, CorsecSquadronScreenplay.QUEST_STRING_3_SIDE.name)
 	local questFourComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_4.type, CorsecSquadronScreenplay.QUEST_STRING_4.name)
+
+	local destroyDutyStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_1.type, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_1.name)
+	local escortDutyStarted = SpaceHelpers:isSpaceQuestActive(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_2.type, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_2.name)
+
+	local destroyDutyComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_1.type, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_1.name)
+	local escortDutyComplete = SpaceHelpers:isSpaceQuestComplete(pPlayer, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_2.type, CorsecSquadronScreenplay.QUEST_STRING_DUTY_4_2.name)
 
 	if (isNeutralPilot and not SpaceHelpers:isCorsecSquadron(pPlayer)) then
 		return convoTemplate:getScreen("non_corsec_pilot") -- Ah, I've heard of you!  You're not a bad pilot from what I understand. What can the CorSec do for you?
@@ -67,15 +75,23 @@ function rheaConvoHandler:getInitialScreen(pPlayer, pNpc, pConvTemplate)
 			Quests
 	--]]
 
-	-- Player is a CorSec pilot and has at least one of the Tier1 skill boxes
-	if (SpaceHelpers:hasNeutralTier1Skill(pPlayer)) then
-
-		-- TODO: Offer duty missions
-
-		return convoTemplate:getScreen("duty_missions")
 	-- Player has an active quest from Sgt Rhea
-	elseif ((questTwoStarted and not questTwoComplete) or (questThreeStarted and not questThreeComplete) or (questFourStarted and not questFourComplete)) then
-			return convoTemplate:getScreen("has_mission")
+	if ((questTwoStarted and not questTwoComplete) or (questThreeStarted and not questThreeComplete) or (questFourStarted and not questFourComplete) or (destroyDutyStarted and not destroyDutyComplete) or (escortDutyStarted and not escortDutyComplete)) then
+		return convoTemplate:getScreen("has_mission")
+	-- Check if players have all the tier1 skill boxes, send them to next trainer.
+	elseif (SpaceHelpers:hasCompletedPilotTier(pPlayer, "neutral", 1)) then
+		return convoTemplate:getScreen("completed_rhea")
+	-- Player is a CorSec pilot and has at least one of the Tier1 skill boxes
+	elseif (SpaceHelpers:hasPilotTierSkill(pPlayer, "neutral", 1)) then
+		-- Check if the player can be trained in the remaining Tier1 Skills
+		if (SpaceHelpers:hasExperienceForTraining(pPlayer, 1)) then
+			return convoTemplate:getScreen("more_training")
+		-- Offer Duty missions
+		else
+			CreatureObject(pPlayer):doAnimation("salute1")
+
+			return convoTemplate:getScreen("duty_missions")
+		end
 	-- Player has finished 4 and has received the reward, but needs to accept training of first pilot skill
 	elseif (questFourComplete and getQuestStatus(playerID .. CorsecSquadronScreenplay.QUEST_STRING_4.name .. ":reward") == "1") then
 		return convoTemplate:getScreen("missions_complete")
@@ -143,43 +159,77 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 	local screen = LuaConversationScreen(pConvScreen)
 	local screenID = screen:getScreenID()
 
-	local pConvScreen = screen:cloneScreen()
-	local clonedConversation = LuaConversationScreen(pConvScreen)
+	local pClonedScreen = screen:cloneScreen()
+	local clonedConversation = LuaConversationScreen(pClonedScreen)
 
 	-- Set player as conversation target
 	clonedConversation:setDialogTextTU(CreatureObject(pPlayer):getFirstName())
 
-	if (self.DEBUG_CORSEC) then
-		print("runScreenHandlers -- Screen ID: " .. screenID)
-	end
+	--print("runScreenHandlers -- Screen ID: " .. screenID)
 
 	local pGhost = CreatureObject(pPlayer):getPlayerObject()
 
 	if (pGhost == nil) then
-		return pConvScreen
+		return pClonedScreen
 	end
 
 	local ghost = LuaPlayerObject(pGhost)
 
 	if (ghost == nil) then
-		return pConvScreen
+		return pClonedScreen
 	end
 
-	if (screenID == "testing_reset") then
-		CorsecSquadronScreenplay:resetRheaQuests(pPlayer)
-		return pConvScreen
-	--elseif (PlayerObject(pGhost):isPrivileged()) then
-		--clonedConversation:addOption("GODMODE - Reset Sgt Rhea Quests", "testing_reset")
-	end
+	-- Handle additional training
+	if (screenID == "more_training") then
+		local skillManager = LuaSkillManager()
 
-	if (screenID == "non_corsec_pilot") then
-		local isOnQuest = true -- TODO add in function to check for active space quest?
-
-		if ((CreatureObject(pPlayer):hasSkill("pilot_neutral_starships_01") or CreatureObject(pPlayer):hasSkill("pilot_neutral_procedures_01") or CreatureObject(pPlayer):hasSkill("pilot_neutral_weapons_01") or CreatureObject(pPlayer):hasSkill("pilot_neutral_droid_01")) and not isOnQuest) then
-			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_c1ff5062", "duty_missions") -- I'm looking for a mission. Do you have any?
-		else
-			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_c1ff5062", "no_missions") -- I'm looking for a mission. Do you have any?
+		if (not CreatureObject(pPlayer):hasSkill("pilot_neutral_starships_01") and skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_starships_01")) then
+			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_c06c7aa9", "train_player_fighters") -- I'm interested in basic fighters.
 		end
+		if (not CreatureObject(pPlayer):hasSkill("pilot_neutral_weapons_01") and skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_weapons_01")) then
+			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_d1431f95", "train_player_component") -- I'm interested in basic starship component use.
+		end
+		if (not CreatureObject(pPlayer):hasSkill("pilot_neutral_procedures_01") and skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_procedures_01")) then
+			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_8523e1fc", "train_player_basics") -- I'm interested in basic training
+		end
+		if (not CreatureObject(pPlayer):hasSkill("pilot_neutral_droid_01") and skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_droid_01")) then
+			clonedConversation:addOption("@conversation/corellia_privateer_trainer:s_b7fc5e5d", "train_player_droid") -- I'm interested in droid interface basics.
+		end
+	-- Handle Skill box granting
+	elseif (string.find(screenID, "train_player_")) then
+		local skillManager = LuaSkillManager()
+
+		local deductExperience = (string.find(screenID, "_free") == nil)
+
+		screenID = string.gsub(screenID, "_free", "")
+
+		if (screenID == "train_player_droid") then
+			if (not deductExperience or skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_droid_01")) then
+				-- Train player Skill Box
+				SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_droid_01", deductExperience)
+			end
+		elseif (screenID == "train_player_basics") then
+			if (not deductExperience or skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_procedures_01")) then
+				-- Train player Skill Box
+				SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_procedures_01", deductExperience)
+			end
+		elseif (screenID == "train_player_fighters") then
+			if (not deductExperience or skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_starships_01")) then
+				-- Train player Skill Box
+				SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_starships_01", deductExperience)
+			end
+		elseif (screenID == "train_player_component") then
+			if (not deductExperience or skillManager:fulfillsSkillPrerequisitesAndXp(pPlayer, "pilot_neutral_weapons_01")) then
+				-- Train player Skill Box
+				SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_weapons_01", deductExperience)
+			end
+		end
+
+		return pClonedScreen
+	elseif (screenID == "destroy_duty") then
+		--destroy_duty_corellia_privateer_6:startQuest(pPlayer, pNpc)
+	elseif (screenID == "escort_duty") then
+		escort_duty_corellia_privateer_7:startQuest(pPlayer, pNpc)
 	elseif (screenID == "yes_join" or screenID == "i_see") then
 		CreatureObject(pPlayer):doAnimation("nod_head_once")
 
@@ -300,10 +350,7 @@ function rheaConvoHandler:runScreenHandlers(pConvTemplate, pPlayer, pNpc, select
 		CreatureObject(pPlayer):doAnimation("belly_laugh")
 
 		assassinate_corellia_privateer_tier1_4a:startQuest(pPlayer, pNpc)
-	elseif (screenID == "train_player") then
-		-- Train player First Skill Box
-		SpaceHelpers:grantSpaceSkill(pPlayer, "pilot_neutral_starships_01")
 	end
 
-	return pConvScreen
+	return pClonedScreen
 end
